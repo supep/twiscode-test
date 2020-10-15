@@ -16,7 +16,7 @@ $found = [];
 $pal = [];
 for($i = 0; $i<$length;$i++)
 {
-	for($j = 0; $j<$length; $j++)
+	for($j = 0; $j<=$length; $j++)
 	{
 		$sub = substr($string, $i, $j-$i);
 		$sub = str_replace(' ', '', $sub);
@@ -26,13 +26,18 @@ for($i = 0; $i<$length;$i++)
 		{
 			if(isset($found[$rev]))
 			{
-				$found[$rev]['end'] = $j;
-				$pal[count($pal)] = $rev;
+				$oldEnd = $found[$rev]['end'];
+				if(($i - $oldEnd) <= 2)
+				{
+					$found[$rev]['end'] = $j;
+					$pal[count($pal)] = $rev;
+				}
 			}
 			elseif(!isset($found[$sub]))
 			{
 				$found[$sub] = [
-					'start' => $i
+					'start' => $i, 
+					'end' => $j
 				];
 			}
 		}
@@ -42,7 +47,7 @@ $longest = 0;
 $output = '';
 foreach($pal as $p)
 {
-	$check = substr($string, $found[$p]['start'], $found[$p]['end']);
+	$check = substr($string, $found[$p]['start'], $found[$p]['end']-$found[$p]['start']);
 	if($output != '')
 	{
 		if($found[$p]['end']-$found[$p]['start'] > $longest)
@@ -57,6 +62,6 @@ foreach($pal as $p)
 		$longest = $found[$p]['end']-$found[$p]['start'];
 	}
 }
-$response['output'] = $pal;
+$response['output'] = $output;
 echo json_encode($response);
 ?>
